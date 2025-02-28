@@ -1,7 +1,10 @@
 let video;
 let bodyPose;
+let visiblePoints;
+let angleRange;
 let poses = [];
 let connections = [];
+let yogaPose;
 
 function preload() {
   let options = {
@@ -16,9 +19,16 @@ function preload() {
   bodyPose = ml5.bodyPose("BlazePose", options);
 }
 
-function setup() {
-  createCanvas(windowWidth, windowHeight);
+ function setup() {
+  
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  yogaPose =  urlParams.get("yoga")?.trim();
+  visiblePoints = yogaAasana[yogaPose]["require_angles"];
+  angleRange = yogaAasana[yogaPose]["angle_range"];
+  
 
+  createCanvas(windowWidth, windowHeight);
   video = createCapture(VIDEO);
   video.hide();
 
@@ -53,17 +63,7 @@ function drawSkeletonAndPoints() {
   for (let i = 0; i < poses.length; i++) {
     let pose = poses[i];
 
-    // Draw skeleton Lines
-    visiblePoints = [
-      [12, 14, 16],
-      [11, 13, 15],
-      [11, 23, 25],
-    ];
-    angleRange = [
-      [85, 95],
-      [70, 95],
-      [70, 95],
-    ];
+   
     for (visiblePoint of visiblePoints) {
       let [iA, iB, iC] = visiblePoint;
       let kpA = pose.keypoints[iA];
